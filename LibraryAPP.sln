@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbConnect", "DbConnect\DbConnect.csproj", "{892F91A0-7084-4E71-8305-A43DEC93B31A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{6B88E4E2-2695-4326-BA3B-C6E63BE0F260}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{892F91A0-7084-4E71-8305-A43DEC93B31A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{892F91A0-7084-4E71-8305-A43DEC93B31A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{892F91A0-7084-4E71-8305-A43DEC93B31A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{892F91A0-7084-4E71-8305-A43DEC93B31A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B88E4E2-2695-4326-BA3B-C6E63BE0F260}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B88E4E2-2695-4326-BA3B-C6E63BE0F260}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B88E4E2-2695-4326-BA3B-C6E63BE0F260}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B88E4E2-2695-4326-BA3B-C6E63BE0F260}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
