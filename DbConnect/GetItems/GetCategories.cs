@@ -1,16 +1,15 @@
 ﻿using System.Collections;
 using System.Data;
-using DbConnect;
 using DbConnect.Models;
 using Npgsql;
 
-namespace ConsoleApp1;
+namespace DbConnect.GetItems;
 
-public class Data : IEnumerable<Book>
+public class GetCategories : IEnumerable<Category>
 {
     private readonly NpgsqlDataReader _dataReader;
-
-    public Data()
+    
+    public GetCategories()
     {
         var dbConnection = new DbConnection();
         var npgsqlConnection = dbConnection.NpgsqlConnection;
@@ -19,17 +18,19 @@ public class Data : IEnumerable<Book>
 
         if (npgsqlConnection.State == ConnectionState.Closed)
             throw new NpgsqlException("Не удалось подключиться к базе данных");
-        const string query = "SELECT * FROM books";
+        const string query = "SELECT c.id as id" +
+                             ", c.name as name " +
+                             "FROM categories c " +
+                             "ORDER BY c.id";
         var npgsqlCommand = new NpgsqlCommand(query,npgsqlConnection);
         _dataReader = npgsqlCommand.ExecuteReader();
     }
 
-    public IEnumerator<Book> GetEnumerator()
+    public IEnumerator<Category> GetEnumerator()
     {
-        
         while (_dataReader.Read())
         {
-            yield return new Book{
+            yield return new Category{
                 Id = Convert.ToInt32(_dataReader["id"].ToString() ?? string.Empty),
                 Name = _dataReader["name"].ToString() ?? string.Empty
             };
