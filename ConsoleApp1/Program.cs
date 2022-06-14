@@ -10,12 +10,12 @@ using Npgsql;
 //     throw new NpgsqlException("Подключение не удалось");
 // }
 
-foreach (var book in Books.GetItems())
-{
-    Console.WriteLine($"{book.Name}, {book.Author}");
-}
+// foreach (var book in Books.GetItems())
+// {
+//     Console.WriteLine($"{book.Name}, {book.Author}");
+// }
 
-
+Console.WriteLine(Styles.Update(7,"Test4"));
 
 /*var data = new Data();
 foreach (var dat in data)
@@ -99,4 +99,4 @@ while(DbConnection.IsConnected)
 {
     DbConnection.Stop();
 }
-Console.ReadKey();
+//Console.ReadKey();

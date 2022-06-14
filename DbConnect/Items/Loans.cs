@@ -5,35 +5,6 @@ namespace DbConnect.Items;
 
 public static class Loans
 {
-    private static void Check(NpgsqlConnection npgsqlConnection, int book, int reader)
-    {
-        var selCmd = new NpgsqlCommand("SELECT * FROM loans " +
-                                       "WHERE book_id = @book_id " +
-                                       "AND reader_id = @reader " +
-                                       "AND passed = @passed ",
-            npgsqlConnection);
-        selCmd.Parameters.AddWithValue("book_id", book);
-        selCmd.Parameters.AddWithValue("reader", reader);
-        selCmd.Parameters.AddWithValue("passed", true);
-
-        var dataReader = selCmd.ExecuteReader();
-
-        try
-        {
-            if (dataReader.HasRows)
-                throw new Exception("Данная запись уже существует в базе данных");
-        }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.Message);
-        }
-        finally
-        {
-            if(dataReader is {IsClosed:false})
-                dataReader.Close();
-        }
-    }
-    
     public static int Add(int book, int reader, DateTime takenDate)
     {
         DbConnection.Start();
@@ -45,7 +16,17 @@ public static class Loans
             throw new NpgsqlException("Не удалось подключиться к базе данных");
         }
 
-        Check(npgsqlConnection,book,reader);
+        var selCmd = new NpgsqlCommand("SELECT * FROM loans " +
+                                       "WHERE book_id = @book_id " +
+                                       "AND reader_id = @reader " +
+                                       "AND passed = @passed ",
+            npgsqlConnection);
+        selCmd.Parameters.AddWithValue("book_id", book);
+        selCmd.Parameters.AddWithValue("reader", reader);
+        selCmd.Parameters.AddWithValue("passed", true);
+        
+        var dataReader = selCmd.ExecuteScalar();
+        if (dataReader != null) throw new Exception("Данная запись уже существует в базе данных");
 
         var insCmd =
             new NpgsqlCommand("INSERT INTO loans (book_id, reader_id, taken_date, passed) VALUES (@book_id, @reader, @takenDate, @passed)",
@@ -105,5 +86,39 @@ public static class Loans
             dataReader.Close();
         
         DbConnection.Stop();
+    }
+
+    public static int Update(int id, int book, int reader, DateTime takenDate)
+    {
+        DbConnection.Start();
+
+        var npgsqlConnection = DbConnection.NpgsqlConnection;
+        var state = DbConnection.IsConnected;
+        if (!state)
+        {
+            throw new NpgsqlException("Не удалось подключиться к базе данных");
+        }
+        
+        var selCmd = new NpgsqlCommand("SELECT * FROM loans " +
+                                       "WHERE id = @id",
+            npgsqlConnection);
+        selCmd.Parameters.AddWithValue("id", id);
+
+        var data = selCmd.ExecuteScalar();
+        if (data == null) throw new Exception("Выбранной записи не существует");
+        
+        
+        var insCmd =
+            new NpgsqlCommand("UPDATE loans SET book_id = @book, reader_id = @reader, taken_date = @takenDate WHERE id = @id",
+                npgsqlConnection);
+        insCmd.Parameters.AddWithValue("id", id);
+        insCmd.Parameters.AddWithValue("book", book);
+        insCmd.Parameters.AddWithValue("reader", reader);
+        insCmd.Parameters.AddWithValue("takenDate", takenDate);
+
+        var result = insCmd.ExecuteNonQuery();
+
+        DbConnection.Stop();
+        return result;
     }
 }

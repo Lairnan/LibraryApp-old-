@@ -5,35 +5,6 @@ namespace DbConnect.Items;
 
 public static class Readers
 {
-    private static void Check(NpgsqlConnection npgsqlConnection, string name, string surname, string? patronymic)
-    {
-        var selCmd = new NpgsqlCommand("SELECT * FROM readers " +
-                                       "WHERE lower(name) = @name " +
-                                       "AND lower(surname) = @surname " +
-                                       "AND lower(patronymic) = @patronymic",
-            npgsqlConnection);
-        selCmd.Parameters.AddWithValue("name", name.ToLower());
-        selCmd.Parameters.AddWithValue("surname", surname.ToLower());
-        selCmd.Parameters.AddWithValue("patronymic", patronymic?.ToLower() ?? string.Empty.ToLower());
-
-        var dataReader = selCmd.ExecuteReader();
-
-        try
-        {
-            if (dataReader.HasRows)
-                throw new Exception("Данная запись уже существует в базе данных");
-        }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.Message);
-        }
-        finally
-        {
-            if(dataReader is {IsClosed:false})
-                dataReader.Close();
-        }
-    }
-    
     public static int Add(string name, string surname, string? patronymic, DateTime? birthday, int type)
     {
         DbConnection.Start();
@@ -45,7 +16,16 @@ public static class Readers
             throw new NpgsqlException("Не удалось подключиться к базе данных");
         }
 
-        Check(npgsqlConnection,name,surname,patronymic);
+        var selCmd = new NpgsqlCommand("SELECT * FROM readers " +
+                                       "WHERE lower(name) = @name " +
+                                       "AND lower(surname) = @surname " +
+                                       "AND lower(patronymic) = @patronymic",
+            npgsqlConnection);
+        selCmd.Parameters.AddWithValue("name", name.ToLower());
+        selCmd.Parameters.AddWithValue("surname", surname.ToLower());
+        selCmd.Parameters.AddWithValue("patronymic", patronymic?.ToLower() ?? string.Empty.ToLower());
+        var dataReader = selCmd.ExecuteScalar();
+        if (dataReader != null) throw new Exception("Данная запись уже существует в базе данных");
         
         var insCmd =
             new NpgsqlCommand("INSERT INTO readers (name, surname, patronymic, birthday, type_id) VALUES (@name,@surname,@patronymic,@birthday,@type_id)",
@@ -107,5 +87,43 @@ public static class Readers
             dataReader.Close();
         
         DbConnection.Stop();
+    }
+
+    public static int Update(int id, string name, string surname, string? patronymic, DateTime? birthday, int type)
+    {
+        if (name == string.Empty || surname == string.Empty) throw new Exception("Поля не должны быть пустыми");
+
+        DbConnection.Start();
+
+        var npgsqlConnection = DbConnection.NpgsqlConnection;
+        var state = DbConnection.IsConnected;
+        if (!state)
+        {
+            throw new NpgsqlException("Не удалось подключиться к базе данных");
+        }
+        
+        var selCmd = new NpgsqlCommand("SELECT * FROM readers " +
+                                       "WHERE id = @id",
+            npgsqlConnection);
+        selCmd.Parameters.AddWithValue("id", id);
+
+        var data = selCmd.ExecuteScalar();
+        if (data == null) throw new Exception("Выбранной записи не существует");
+        
+        
+        var insCmd =
+            new NpgsqlCommand("UPDATE readers SET name = @name, surname = @surname, patronymic = @patronymic, birthday = @birthday, type_id = @type WHERE id = @id",
+                npgsqlConnection);
+        insCmd.Parameters.AddWithValue("id", id);
+        insCmd.Parameters.AddWithValue("name", name);
+        insCmd.Parameters.AddWithValue("surname", surname);
+        insCmd.Parameters.AddWithValue("patronymic", patronymic ?? string.Empty);
+        insCmd.Parameters.AddWithValue("birthday", birthday!);
+        insCmd.Parameters.AddWithValue("type", type);
+
+        var result = insCmd.ExecuteNonQuery();
+
+        DbConnection.Stop();
+        return result;
     }
 }
