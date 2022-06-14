@@ -1,0 +1,19 @@
+﻿<Page x:Class="LibraryApp.Views.Pages.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      DataContext="{Binding MainPageViewModel, Source={StaticResource ViewModelLocator}}"
+      mc:Ignorable="d"
+      Title="MainPage" Height="450" Width="800">
+    <StackPanel 
+        Orientation="Vertical"
+        VerticalAlignment="Center"
+        HorizontalAlignment="Center">
+        <Button
+            Background="{DynamicResource MaterialDesignDarkBackground}"
+            Foreground="{DynamicResource MaterialDesignDarkForeground}"
+            Content="Просмотреть весь список книг"
+            Command="{Binding GoToViewBooksCommand}"/>
+    </StackPanel>
+</Page>

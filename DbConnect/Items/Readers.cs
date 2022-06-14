@@ -36,8 +36,7 @@ public static class Readers
     
     public static int Add(string name, string surname, string? patronymic, DateTime? birthday, int type)
     {
-        if (!DbConnection.IsConnected)
-            DbConnection.Start();
+        DbConnection.Start();
 
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
@@ -57,13 +56,15 @@ public static class Readers
         insCmd.Parameters.AddWithValue("birthday", birthday!);
         insCmd.Parameters.AddWithValue("type_id", type);
         
-        return insCmd.ExecuteNonQuery();
+        var result = insCmd.ExecuteNonQuery();
+
+        DbConnection.Stop();
+        return result;
     }
 
     private static NpgsqlDataReader GetDataReader()
     {
-        if (!DbConnection.IsConnected)
-            DbConnection.Start();
+        DbConnection.Start();
 
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
@@ -104,5 +105,7 @@ public static class Readers
 
         if (dataReader is {IsClosed: false})
             dataReader.Close();
+        
+        DbConnection.Stop();
     }
 }

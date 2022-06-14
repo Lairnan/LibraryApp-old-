@@ -2,17 +2,17 @@
 using DbConnect.Items;
 using Npgsql;
 
-DbConnection.Start();
-var state = DbConnection.IsConnected;
+// DbConnection.Start();
+// var state = DbConnection.IsConnected;
+//
+// if (!state)
+// {
+//     throw new NpgsqlException("Подключение не удалось");
+// }
 
-if (!state)
+foreach (var book in Books.GetItems())
 {
-    throw new NpgsqlException("Подключение не удалось");
-}
-
-foreach (var author in Authors.GetItems())
-{
-    Console.WriteLine($"{author.Name}, {author.Surname}");
+    Console.WriteLine($"{book.Name}, {book.Author}");
 }
 
 
@@ -95,4 +95,8 @@ foreach (var dat in data)
 // Console.WriteLine(date.ToString("dd MMM yyyy г. ddd."));
 
 DbConnection.Stop();
-// Console.ReadKey();
+while(DbConnection.IsConnected)
+{
+    DbConnection.Stop();
+}
+Console.ReadKey();

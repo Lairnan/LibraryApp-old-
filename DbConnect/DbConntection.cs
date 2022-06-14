@@ -35,5 +35,5 @@ public static class DbConnection
 
     public static bool IsConnected { get; private set; }
 
-    internal static NpgsqlConnection NpgsqlConnection;
+    internal static NpgsqlConnection NpgsqlConnection = null!;
 }

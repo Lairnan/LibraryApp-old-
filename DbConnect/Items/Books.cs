@@ -34,8 +34,7 @@ public static class Books
 
     public static int Add(string name, int author, int category, int style)
     {
-        if (!DbConnection.IsConnected)
-            DbConnection.Start();
+        DbConnection.Start();
         
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
@@ -54,13 +53,15 @@ public static class Books
         insCmd.Parameters.AddWithValue("categorie_id", category);
         insCmd.Parameters.AddWithValue("style_id", style);
         
-        return insCmd.ExecuteNonQuery();
+        var result = insCmd.ExecuteNonQuery();
+
+        DbConnection.Stop();
+        return result;
     }
 
     private static NpgsqlDataReader GetDataReader()
     {
-        if (!DbConnection.IsConnected)
-            DbConnection.Start();
+        DbConnection.Start();
 
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
@@ -100,5 +101,7 @@ public static class Books
 
         if (dataReader is {IsClosed: false})
             dataReader.Close();
+        
+        DbConnection.Stop();
     }
 }

@@ -38,8 +38,7 @@ public static class Authors
 
     public static int Add(string name, string surname,string? patronymic)
     {
-        if (!DbConnection.IsConnected)
-            DbConnection.Start();
+        DbConnection.Start();
 
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
@@ -60,14 +59,16 @@ public static class Authors
         insCmd.Parameters.AddWithValue("name", name);
         insCmd.Parameters.AddWithValue("surname", surname);
         insCmd.Parameters.AddWithValue("patronymic", patronymic ?? string.Empty);
-        
-        return insCmd.ExecuteNonQuery();
+
+        var result = insCmd.ExecuteNonQuery();
+
+        DbConnection.Stop();
+        return result;
     }
 
     private static NpgsqlDataReader GetDataReader()
     {
-        if (!DbConnection.IsConnected)
-            DbConnection.Start();
+        DbConnection.Start();
 
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
@@ -102,5 +103,7 @@ public static class Authors
 
         if (dataReader is {IsClosed: false})
             dataReader.Close();
+        
+        DbConnection.Stop();
     }
 }

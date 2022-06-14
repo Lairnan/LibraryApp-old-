@@ -36,8 +36,7 @@ public static class Loans
     
     public static int Add(int book, int reader, DateTime takenDate)
     {
-        if (!DbConnection.IsConnected)
-            DbConnection.Start();
+        DbConnection.Start();
 
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
@@ -56,13 +55,15 @@ public static class Loans
         insCmd.Parameters.AddWithValue("takenDate", takenDate);
         insCmd.Parameters.AddWithValue("passed", true);
         
-        return insCmd.ExecuteNonQuery();
+        var result = insCmd.ExecuteNonQuery();
+
+        DbConnection.Stop();
+        return result;
     }
 
     private static NpgsqlDataReader GetDataReader()
     {
-        if (!DbConnection.IsConnected)
-            DbConnection.Start();
+        DbConnection.Start();
 
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
@@ -102,5 +103,7 @@ public static class Loans
 
         if (dataReader is {IsClosed: false})
             dataReader.Close();
+        
+        DbConnection.Stop();
     }
 }

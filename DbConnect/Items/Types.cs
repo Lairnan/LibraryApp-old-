@@ -32,8 +32,7 @@ public static class Types
 
     public static int Add(string name)
     {
-        if (!DbConnection.IsConnected)
-            DbConnection.Start();
+        DbConnection.Start();
 
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
@@ -49,13 +48,15 @@ public static class Types
                 npgsqlConnection);
         insCmd.Parameters.AddWithValue("name", name);
         
-        return insCmd.ExecuteNonQuery();
+        var result = insCmd.ExecuteNonQuery();
+
+        DbConnection.Stop();
+        return result;
     }
 
     private static NpgsqlDataReader GetDataReader()
     {
-        if (!DbConnection.IsConnected)
-            DbConnection.Start();
+        DbConnection.Start();
 
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
@@ -87,5 +88,7 @@ public static class Types
 
         if (dataReader is {IsClosed: false})
             dataReader.Close();
+        
+        DbConnection.Stop();
     }
 }
