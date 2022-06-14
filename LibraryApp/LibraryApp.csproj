@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net6.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <UseWPF>true</UseWPF>
+        <StartupObject>LibraryApp.Program</StartupObject>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\DbConnect\DbConnect.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="DevExpressMvvm" Version="21.1.5" />
+      <PackageReference Include="MaterialDesignThemes" Version="4.6.0-ci209" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0-preview.5.22301.12" />
+      <PackageReference Include="PropertyChanged.Fody" Version="3.4.1" />
+      <PackageReference Include="Scrutor" Version="4.2.0" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,55 @@
+﻿<Window x:Class="LibraryApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        DataContext="{Binding MainViewModel, Source={StaticResource ViewModelLocator}}"
+        WindowStyle="None"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterOwner"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button 
+                Grid.Column="0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Margin="15"
+                Width="50"
+                Height="30"
+                Content="&lt;-"
+                Command="{Binding GoToBackCommand}"/>
+            <Label 
+                Grid.Column="1"
+                Content="{Binding Title}"/>
+            <UniformGrid 
+                Grid.Column="2" 
+                Columns="3"
+                Margin="5">
+                <Button
+                    Width="50"
+                    Height="30"
+                    Margin="0 0 10 0"
+                    Content="-"
+                    Command="{Binding MinimizeApplicationCommand}"/>
+                <Button 
+                    Width="50"
+                    Height="30"
+                    Content="X"
+                    Command="{Binding CloseApplicationCommand}"/>
+            </UniformGrid>
+        </Grid>
+        <Frame Grid.Row="1" 
+            Content="{Binding CurrentPage}"
+            NavigationUIVisibility="Hidden"/>
+    </Grid>
+</Window>
