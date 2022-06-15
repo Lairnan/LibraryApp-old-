@@ -111,4 +111,27 @@ public static class Loans
 
         return result;
     }
+
+    public static int Remove(int id)
+    {
+        var npgsqlConnection = DbConnection.NpgsqlConnection;
+        var state = DbConnection.IsConnected;
+        if (!state)
+        {
+            throw new NpgsqlException("Не удалось подключиться к базе данных");
+        }
+        
+        var selCmd = new NpgsqlCommand("SELECT * FROM loans " +
+                                       "WHERE id = @id",
+            npgsqlConnection);
+        selCmd.Parameters.AddWithValue("id", id);
+
+        var data = selCmd.ExecuteScalar();
+        if (data == null) throw new Exception("Выбранной записи не существует");
+
+        var remCmd = new NpgsqlCommand("DELETE FROM loans WHERE id = @id", npgsqlConnection);
+        remCmd.Parameters.AddWithValue("id",id);
+
+        return remCmd.ExecuteNonQuery();
+    }
 }
