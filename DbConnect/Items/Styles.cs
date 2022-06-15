@@ -7,8 +7,6 @@ public static class Styles
 {
     public static int Add(string name)
     {
-        DbConnection.Start();
-
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
         if (!state)
@@ -31,14 +29,11 @@ public static class Styles
         
         var result = insCmd.ExecuteNonQuery();
 
-        DbConnection.Stop();
         return result;
     }
 
     private static NpgsqlDataReader GetDataReader()
     {
-        DbConnection.Start();
-
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
         if (!state)
@@ -54,7 +49,7 @@ public static class Styles
         return npgsqlCommand.ExecuteReader();
     }
 
-    public static IEnumerable<Style> GetItems()
+    public static IEnumerable<Style> Get()
     {
         var dataReader = GetDataReader();
         
@@ -68,15 +63,11 @@ public static class Styles
 
         if (dataReader is {IsClosed: false})
             dataReader.Close();
-        
-        DbConnection.Stop();
     }
 
     public static int Update(int id, string name)
     {
         if (name == string.Empty) throw new Exception("Поля не должны быть пустыми");
-
-        DbConnection.Start();
 
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
@@ -102,7 +93,6 @@ public static class Styles
 
         var result = insCmd.ExecuteNonQuery();
 
-        DbConnection.Stop();
         return result;
     }
 }

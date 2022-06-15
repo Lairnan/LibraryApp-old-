@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Data;
+﻿using System.Data;
 using DbConnect.Models;
 using Npgsql;
 
@@ -9,8 +8,6 @@ public static class Authors
 {
     public static int Add(string name, string surname,string? patronymic)
     {
-        DbConnection.Start();
-
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
         if (!state)
@@ -43,14 +40,11 @@ public static class Authors
 
         var result = insCmd.ExecuteNonQuery();
 
-        DbConnection.Stop();
         return result;
     }
 
     private static NpgsqlDataReader GetDataReader()
     {
-        DbConnection.Start();
-
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
         if (!state)
@@ -68,7 +62,7 @@ public static class Authors
         return npgsqlCommand.ExecuteReader();
     }
 
-    public static IEnumerable<Author> GetItems()
+    public static IEnumerable<Author> Get()
     {
         var dataReader = GetDataReader();
         
@@ -84,16 +78,12 @@ public static class Authors
 
         if (dataReader is {IsClosed: false})
             dataReader.Close();
-        
-        DbConnection.Stop();
     }
 
     public static int Update(int id,string name, string surname, string? patronymic)
     {
         if (name == string.Empty || surname == string.Empty) throw new Exception("Поля не должны быть пустыми");
         
-        DbConnection.Start();
-
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
         if (!state)
@@ -120,7 +110,6 @@ public static class Authors
 
         var result = insCmd.ExecuteNonQuery();
 
-        DbConnection.Stop();
         return result;
     }
 }

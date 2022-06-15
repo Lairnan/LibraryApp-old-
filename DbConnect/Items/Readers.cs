@@ -7,8 +7,6 @@ public static class Readers
 {
     public static int Add(string name, string surname, string? patronymic, DateTime? birthday, int type)
     {
-        DbConnection.Start();
-
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
         if (!state)
@@ -38,14 +36,11 @@ public static class Readers
         
         var result = insCmd.ExecuteNonQuery();
 
-        DbConnection.Stop();
         return result;
     }
 
     private static NpgsqlDataReader GetDataReader()
     {
-        DbConnection.Start();
-
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
         if (!state)
@@ -66,7 +61,7 @@ public static class Readers
         return npgsqlCommand.ExecuteReader();
     }
 
-    public static IEnumerable<Reader> GetItems()
+    public static IEnumerable<Reader> Get()
     {
         var dataReader = GetDataReader();
         
@@ -85,15 +80,11 @@ public static class Readers
 
         if (dataReader is {IsClosed: false})
             dataReader.Close();
-        
-        DbConnection.Stop();
     }
 
     public static int Update(int id, string name, string surname, string? patronymic, DateTime? birthday, int type)
     {
         if (name == string.Empty || surname == string.Empty) throw new Exception("Поля не должны быть пустыми");
-
-        DbConnection.Start();
 
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
@@ -123,7 +114,6 @@ public static class Readers
 
         var result = insCmd.ExecuteNonQuery();
 
-        DbConnection.Stop();
         return result;
     }
 }

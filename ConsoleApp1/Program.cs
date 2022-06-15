@@ -1,7 +1,9 @@
 ﻿using DbConnect;
 using DbConnect.Items;
 
-Console.WriteLine(Styles.Update(7,"Test4"));
+DbConnection.Start();
+
+Console.WriteLine(string.Join("\n\r",Books.Get().Select(book=>$"{book.Name}, {book.Author}")));
 
 DbConnection.Stop();
 while(DbConnection.IsConnected)

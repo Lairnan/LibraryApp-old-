@@ -7,8 +7,6 @@ public static class Loans
 {
     public static int Add(int book, int reader, DateTime takenDate)
     {
-        DbConnection.Start();
-
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
         if (!state)
@@ -38,14 +36,11 @@ public static class Loans
         
         var result = insCmd.ExecuteNonQuery();
 
-        DbConnection.Stop();
         return result;
     }
 
     private static NpgsqlDataReader GetDataReader()
     {
-        DbConnection.Start();
-
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
         if (!state)
@@ -66,7 +61,7 @@ public static class Loans
         return npgsqlCommand.ExecuteReader();
     }
 
-    public static IEnumerable<Loan> GetItems()
+    public static IEnumerable<Loan> Get()
     {
         var dataReader = GetDataReader();
         
@@ -84,14 +79,10 @@ public static class Loans
 
         if (dataReader is {IsClosed: false})
             dataReader.Close();
-        
-        DbConnection.Stop();
     }
 
     public static int Update(int id, int book, int reader, DateTime takenDate)
     {
-        DbConnection.Start();
-
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
         if (!state)
@@ -118,7 +109,6 @@ public static class Loans
 
         var result = insCmd.ExecuteNonQuery();
 
-        DbConnection.Stop();
         return result;
     }
 }

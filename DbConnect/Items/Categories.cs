@@ -7,8 +7,6 @@ public static class Categories
 {
     public static int Add(string name)
     {
-        DbConnection.Start();
-        
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
         if (!state)
@@ -31,7 +29,6 @@ public static class Categories
         
         var result = insCmd.ExecuteNonQuery();
 
-        DbConnection.Stop();
         return result;
     }
 
@@ -54,7 +51,7 @@ public static class Categories
         return npgsqlCommand.ExecuteReader();
     }
 
-    public static IEnumerable<Category> GetItems()
+    public static IEnumerable<Category> Get()
     {
         var dataReader = GetDataReader();
         
@@ -68,16 +65,12 @@ public static class Categories
 
         if (dataReader is {IsClosed: false})
             dataReader.Close();
-        
-        DbConnection.Stop();
     }
 
     public static int Update(int id, string name)
     {
         if (name == string.Empty) throw new Exception("Поля не должны быть пустыми");
         
-        DbConnection.Start();
-
         var npgsqlConnection = DbConnection.NpgsqlConnection;
         var state = DbConnection.IsConnected;
         if (!state)
@@ -102,7 +95,6 @@ public static class Categories
 
         var result = insCmd.ExecuteNonQuery();
 
-        DbConnection.Stop();
         return result;
     }
 }
