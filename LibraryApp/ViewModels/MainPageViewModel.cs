@@ -5,7 +5,7 @@ using LibraryApp.Views.Pages;
 
 namespace LibraryApp.ViewModels;
 
-public class MainPageViewModel : ISingleton
+public class MainPageViewModel : BindableBase, ISingleton
 {
     private readonly PageService _pageService;
     
@@ -16,6 +16,6 @@ public class MainPageViewModel : ISingleton
 
     public ICommand GoToViewBooksCommand => new DelegateCommand(() =>
     {
-        _pageService.Navigate(new MainPage());
+        _pageService.Navigate(new ViewBooksPage());
     });
 }

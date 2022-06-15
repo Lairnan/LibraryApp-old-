@@ -15,5 +15,6 @@ public static class Program
         {
             DbConnection.Stop();
         }
+        GC.Collect();
     }
 }

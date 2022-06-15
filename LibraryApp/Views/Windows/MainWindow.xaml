@@ -1,19 +1,20 @@
-﻿<Window x:Class="LibraryApp.MainWindow"
+﻿<Window x:Class="LibraryApp.Views.Windows.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
         DataContext="{Binding MainViewModel, Source={StaticResource ViewModelLocator}}"
         WindowStyle="None"
         mc:Ignorable="d"
         WindowStartupLocation="CenterOwner"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
+    <Grid ShowGridLines="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
+        <Grid Grid.Row="0" MouseLeftButtonDown="ContentElement_OnMouseLeftButtonDown">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100"/>
                 <ColumnDefinition Width="*"/>
@@ -33,19 +34,32 @@
                 Content="{Binding Title}"/>
             <UniformGrid 
                 Grid.Column="2" 
-                Columns="3"
-                Margin="5">
+                Columns="3">
                 <Button
                     Width="50"
                     Height="30"
                     Margin="0 0 10 0"
-                    Content="-"
-                    Command="{Binding MinimizeApplicationCommand}"/>
+                    Command="{Binding MinimizeApplicationCommand}">
+                    <Button.Content>
+                        <fa:FontAwesome Icon="WindowMinimize"/>
+                    </Button.Content>
+                </Button>
                 <Button 
                     Width="50"
                     Height="30"
-                    Content="X"
-                    Command="{Binding CloseApplicationCommand}"/>
+                    Click="LeftMouseButtonUp">
+                    <Button.Content>
+                        <fa:FontAwesome Icon="WindowMaximize"/>
+                    </Button.Content>
+                </Button>
+                <Button 
+                    Width="50"
+                    Height="30"
+                    Command="{Binding CloseApplicationCommand}">
+                    <Button.Content>
+                        <fa:FontAwesome Icon="Close"/>
+                    </Button.Content>
+                </Button>
             </UniformGrid>
         </Grid>
         <Frame Grid.Row="1" 
