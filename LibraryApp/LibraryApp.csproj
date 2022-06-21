@@ -8,6 +8,10 @@
         <StartupObject>LibraryApp.Program</StartupObject>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    </PropertyGroup>
+
     <ItemGroup>
       <ProjectReference Include="..\DbConnect\DbConnect.csproj" />
     </ItemGroup>

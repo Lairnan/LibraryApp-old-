@@ -39,7 +39,7 @@ public class PageBooksViewModel : BindableBase, IScoped
     }
 
 
-    public Book? SelectedValue { get; set; }
+    public int SelectedIndex { get; set; }
 
     private string _filterText = null!;
 
@@ -89,11 +89,20 @@ public class PageBooksViewModel : BindableBase, IScoped
 
     public ObservableCollection<Book> ListBooks { get; set; } = new();
 
-    public static DelegateCommand<Book> EditCommand => new(item =>
+    public DelegateCommand<int> EditCommand => new(index =>
     {
-        EditBookViewModel.Book = item;
+        var book = ListBooks[index];
+        EditBookViewModel.Book = book;
         var editBook = new EditBook();
         editBook.ShowDialog();
-        // MessageBox.Show(item.Id.ToString());
-    },item=>item != null);
+        EditBookViewModel.ListBooks(ref book);
+        Application.Current.Dispatcher.Invoke((Action) delegate
+        {
+            ListBooks[SelectedIndex] = book;
+        });
+        if (Application.Current.Windows.Count > 1)
+        {
+            Application.Current.Windows[1].Close();
+        }
+    },index=>index != -1);
 }

@@ -44,13 +44,13 @@
             Grid.Row="1"
             ItemsSource="{Binding ListBooks}"
             SelectionMode="Extended"
-            SelectedItem="{Binding SelectedValue}">
+            SelectedIndex="{Binding SelectedIndex}">
             <ListView.ContextMenu>
                 <ContextMenu>
                     <MenuItem 
                         Header="Изменить"
                         Command="{Binding EditCommand}"
-                        CommandParameter="{Binding SelectedValue}"/>
+                        CommandParameter="{Binding SelectedIndex}"/>
                 </ContextMenu>
             </ListView.ContextMenu>
             <ListView.View>

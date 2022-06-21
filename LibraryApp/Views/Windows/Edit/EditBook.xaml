@@ -6,8 +6,10 @@
         DataContext="{Binding Source={StaticResource ViewModelLocator}, Path=EditBookViewModel}"
         mc:Ignorable="d"
         Title="EditBooks"
-        Width="250"
-        Height="225"
+        Width="400"
+        Height="250"
+        MinWidth="400"
+        MinHeight="250"
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <Style TargetType="StackPanel">
@@ -15,28 +17,44 @@
             <Setter Property="Margin" Value="5"/>
         </Style>
         <Style TargetType="TextBlock">
-            <Setter Property="Width" Value="75"/>
+            <Setter Property="Width" Value="100"/>
         </Style>
         <Style TargetType="TextBox">
-            <Setter Property="Width" Value="125"/>
+            <Setter Property="Width" Value="250"/>
             <Setter Property="Padding" Value="2.5"/>
         </Style>
         <Style TargetType="ComboBox">
-            <Setter Property="Width" Value="125"/>
+            <Setter Property="Width" Value="250"/>
         </Style>
     </Window.Resources>
     <StackPanel Orientation="Vertical">
         <StackPanel>
             <TextBlock Text="№"/>
-            <TextBox Text="{Binding Id}"/>
+            <TextBox 
+                IsEnabled="False"
+                Text="{Binding Id}"/>
         </StackPanel>
         <StackPanel>
             <TextBlock Text="Название"/>
-            <TextBox Text="{Binding Name}"/>
+            <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
         </StackPanel>
         <StackPanel>
             <TextBlock Text="Автор"/>
-            <ComboBox ItemsSource="{Binding Authors}" SelectedIndex="{Binding SelectedAuthor}"/>
+            <ComboBox ItemsSource="{Binding Authors}" SelectedIndex="{Binding SelectedAuthor}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0} {1} {2}">
+                                    <Binding Path="Surname"/>
+                                    <Binding Path="Name"/>
+                                    <Binding Path="Patronymic"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
         </StackPanel>
         <StackPanel>
             <TextBlock Text="Жанр"/>
@@ -46,5 +64,10 @@
             <TextBlock Text="Категория"/>
             <ComboBox ItemsSource="{Binding Categories}" SelectedIndex="{Binding SelectedCategory}"/>
         </StackPanel>
+        <Button
+            Margin="0 10 0 0"
+            Width="125"
+            Content="Сохранить"
+            Command="{Binding SaveBookCommand}"/>
     </StackPanel>
 </Window>
