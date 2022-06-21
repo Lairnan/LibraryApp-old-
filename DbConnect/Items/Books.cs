@@ -7,8 +7,9 @@ public static class Books
 {
     public static int Add(string name, int author, int category, int style)
     {
-        var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
+        using var db = new DbConnection();
+        var npgsqlConnection = db.NpgsqlConnection;
+        var state = db.IsConnected;
         if (!state)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
@@ -37,10 +38,10 @@ public static class Books
         return result;
     }
 
-    private static NpgsqlDataReader GetDataReader()
+    private static NpgsqlDataReader GetDataReader(DbConnection db)
     {
-        var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
+        var npgsqlConnection = db.NpgsqlConnection;
+        var state = db.IsConnected;
         if (!state)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
@@ -48,9 +49,14 @@ public static class Books
 
         const string query = "SELECT b.id as id" +
                              ", b.name as name" +
-                             ", concat_ws(' ',a.name,a.surname,a.patronymic) as author" +
-                             ", c.name as category" +
-                             ", s.name as style " +
+                             ", a.id as \"authorId\"" +
+                             ", a.surname as \"authorSurname\"" +
+                             ", a.name as \"authorName\"" +
+                             ", a.patronymic as \"authorPatronymic\"" +
+                             ", c.id as categoryId" +
+                             ", c.name as categoryName" +
+                             ", s.id as styleId " +
+                             ", s.name as styleName " +
                              "FROM books b " +
                              "LEFT JOIN authors a on b.author_id = a.id " +
                              "LEFT JOIN categories c on b.category_id = c.id " +
@@ -62,16 +68,32 @@ public static class Books
 
     public static IEnumerable<Book> Get()
     {
-        var dataReader = GetDataReader();
+        using var db = new DbConnection();
+        
+        var dataReader = GetDataReader(db);
         
         while (dataReader.Read())
         {
             yield return new Book{
                 Id = Convert.ToInt32(dataReader["id"].ToString() ?? string.Empty),
                 Name = dataReader["name"].ToString() ?? string.Empty,
-                Author = dataReader["author"].ToString() ?? string.Empty,
-                Category = dataReader["category"].ToString() ?? string.Empty,
-                Style = dataReader["style"].ToString() ?? string.Empty
+                Author = new Author
+                {
+                    Id = Convert.ToInt32(dataReader["authorId"].ToString() ?? string.Empty) - 1,
+                    Name = dataReader["authorName"].ToString() ?? string.Empty,
+                    Surname = dataReader["authorSurname"].ToString() ?? string.Empty,
+                    Patronymic = dataReader["authorPatronymic"].ToString() ?? string.Empty,
+                },
+                Category = new Category
+                {
+                    Id = Convert.ToInt32(dataReader["categoryId"].ToString() ?? string.Empty) - 1,
+                    Name = dataReader["categoryName"].ToString() ?? string.Empty
+                },
+                Style = new Style
+                {
+                    Id = Convert.ToInt32(dataReader["styleId"].ToString() ?? string.Empty) - 1,
+                    Name = dataReader["styleName"].ToString() ?? string.Empty
+                },
             };
         }
 
@@ -84,8 +106,9 @@ public static class Books
     {
         if (name == string.Empty) throw new Exception("Поля не должны быть пустыми");
         
-        var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
+        using var db = new DbConnection();
+        var npgsqlConnection = db.NpgsqlConnection;
+        var state = db.IsConnected;
         if (!state)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
@@ -116,8 +139,9 @@ public static class Books
 
     public static int Remove(int id)
     {
-        var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
+        using var db = new DbConnection();
+        var npgsqlConnection = db.NpgsqlConnection;
+        var state = db.IsConnected;
         if (!state)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");

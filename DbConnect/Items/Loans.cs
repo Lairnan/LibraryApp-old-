@@ -7,8 +7,9 @@ public static class Loans
 {
     public static int Add(int book, int reader, DateTime takenDate)
     {
-        var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
+        using var db = new DbConnection();
+        var npgsqlConnection = db.NpgsqlConnection;
+        var state = db.IsConnected;
         if (!state)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
@@ -39,18 +40,22 @@ public static class Loans
         return result;
     }
 
-    private static NpgsqlDataReader GetDataReader()
+    private static NpgsqlDataReader GetDataReader(DbConnection db)
     {
-        var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
+        var npgsqlConnection = db.NpgsqlConnection;
+        var state = db.IsConnected;
         if (!state)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
         }
 
         const string query = "SELECT l.id as id" +
-                             ", b.name as book" +
-                             ", concat_ws(' ',r.surname,r.name,r.patronymic) as reader" +
+                             ", b.id as bookid" +
+                             ", b.name as bookname" +
+                             ", r.id as readerid" +
+                             ", r.name as readername" +
+                             ", r.surname as readersurname" +
+                             ", r.patronymic as readerpatronymic" +
                              ", l.taken_date as taken_date" +
                              ", l.passed as passed " +
                              "FROM loans l " +
@@ -63,15 +68,27 @@ public static class Loans
 
     public static IEnumerable<Loan> Get()
     {
-        var dataReader = GetDataReader();
+        using var db = new DbConnection();
+        
+        var dataReader = GetDataReader(db);
         
         while (dataReader.Read())
         {
             DateTime.TryParse(dataReader["taken_date"].ToString(), out var takenDate);
             yield return new Loan{
                 Id = Convert.ToInt32(dataReader["id"].ToString() ?? string.Empty),
-                Book = dataReader["book"].ToString() ?? string.Empty,
-                Reader = dataReader["reader"].ToString() ?? string.Empty,
+                Book = new Book
+                {
+                    Id = Convert.ToInt32(dataReader["bookid"].ToString() ?? string.Empty),
+                    Name = dataReader["bookname"].ToString() ?? string.Empty,
+                },
+                Reader = new Reader
+                {
+                    Id = Convert.ToInt32(dataReader["readerid"].ToString() ?? string.Empty),
+                    Name = dataReader["readername"].ToString() ?? string.Empty,
+                    Surname = dataReader["readersurname"].ToString() ?? string.Empty,
+                    Patronymic = dataReader["readerpatronymic"].ToString() ?? string.Empty
+                },
                 TakenDate = takenDate,
                 Passed = bool.Parse(dataReader["passed"].ToString() ?? "false")
             };
@@ -83,8 +100,9 @@ public static class Loans
 
     public static int Update(int id, int book, int reader, DateTime takenDate)
     {
-        var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
+        using var db = new DbConnection();
+        var npgsqlConnection = db.NpgsqlConnection;
+        var state = db.IsConnected;
         if (!state)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
@@ -114,8 +132,9 @@ public static class Loans
 
     public static int Remove(int id)
     {
-        var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
+        using var db = new DbConnection();
+        var npgsqlConnection = db.NpgsqlConnection;
+        var state = db.IsConnected;
         if (!state)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");

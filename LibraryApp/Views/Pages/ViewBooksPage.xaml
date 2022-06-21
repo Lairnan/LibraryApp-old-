@@ -5,7 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       DataContext="{Binding PageBooksViewModel, Source={StaticResource ViewModelLocator}}"
       mc:Ignorable="d"
-      Title="ViewBooksPage" Height="450" Width="800">
+      Title="ViewBooksPage">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -57,9 +57,17 @@
                 <GridView>
                     <GridViewColumn Header="№" DisplayMemberBinding="{Binding Id}"/>
                     <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Name}"/>
-                    <GridViewColumn Header="Автор" DisplayMemberBinding="{Binding Author}"/>
-                    <GridViewColumn Header="Жанр" DisplayMemberBinding="{Binding Style}"/>
-                    <GridViewColumn Header="Категория" DisplayMemberBinding="{Binding Category}"/>
+                    <GridViewColumn Header="Автор">
+                        <GridViewColumn.DisplayMemberBinding>
+                            <MultiBinding StringFormat="{}{0} {1} {2}">
+                                <Binding Path="Author.Surname"/>
+                                <Binding Path="Author.Name"/>
+                                <Binding Path="Author.Patronymic"/>
+                            </MultiBinding>
+                        </GridViewColumn.DisplayMemberBinding>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Жанр" DisplayMemberBinding="{Binding Style.Name}"/>
+                    <GridViewColumn Header="Категория" DisplayMemberBinding="{Binding Category.Name}"/>
                 </GridView>
             </ListView.View>
         </ListView>

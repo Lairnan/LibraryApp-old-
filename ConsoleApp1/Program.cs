@@ -1,7 +1,4 @@
-﻿using DbConnect;
-using DbConnect.Items;
-
-DbConnection.Start();
+﻿using DbConnect.Items;
 
 Console.WriteLine(string.Join("\n\r",Books.Get().Select(book=>$"{book.Id}, {book.Name}, {book.Author}")));
 
@@ -14,12 +11,6 @@ catch (Exception ex)
     Console.WriteLine(ex.Message);
 }
 
-Console.WriteLine(string.Join("\n\r",Books.Get().Select(book=>$"{book.Id}, {book.Name}, {book.Author}")));
-
-DbConnection.Stop();
-while(DbConnection.IsConnected)
-{
-    DbConnection.Stop();
-}
+Console.WriteLine(string.Join("\n\r",Authors.Get().Select(author=>$"{author.Id}, {author.Name}, {author.Surname}")));
 
 GC.Collect();

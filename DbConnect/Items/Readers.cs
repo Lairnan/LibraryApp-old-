@@ -1,5 +1,6 @@
 ﻿using DbConnect.Models;
 using Npgsql;
+using Type = DbConnect.Models.Type;
 
 namespace DbConnect.Items;
 
@@ -7,8 +8,9 @@ public static class Readers
 {
     public static int Add(string name, string surname, string? patronymic, DateTime? birthday, int type)
     {
-        var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
+        using var db = new DbConnection();
+        var npgsqlConnection = db.NpgsqlConnection;
+        var state = db.IsConnected;
         if (!state)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
@@ -39,10 +41,10 @@ public static class Readers
         return result;
     }
 
-    private static NpgsqlDataReader GetDataReader()
+    private static NpgsqlDataReader GetDataReader(DbConnection db)
     {
-        var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
+        var npgsqlConnection = db.NpgsqlConnection;
+        var state = db.IsConnected;
         if (!state)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
@@ -53,6 +55,7 @@ public static class Readers
                              ", r.surname as surname" +
                              ", r.patronymic as patronymic" +
                              ", r.birthday as birthday" +
+                             ", t.id as typeid " +
                              ", t.name as typename " +
                              "FROM readers r " +
                              "LEFT JOIN types t on r.type_id = t.id " +
@@ -63,7 +66,9 @@ public static class Readers
 
     public static IEnumerable<Reader> Get()
     {
-        var dataReader = GetDataReader();
+        using var db = new DbConnection();
+        
+        var dataReader = GetDataReader(db);
         
         while (dataReader.Read())
         {
@@ -74,7 +79,11 @@ public static class Readers
                 Surname = dataReader["surname"].ToString() ?? string.Empty,
                 Patronymic = dataReader["patronymic"].ToString() ?? string.Empty,
                 Birthday = birthday,
-                Type = dataReader["typename"].ToString() ?? string.Empty
+                Type = new Type()
+                {
+                    Id = Convert.ToInt32(dataReader["typeid"].ToString() ?? string.Empty),
+                    Name = dataReader["typeid"].ToString() ?? string.Empty
+                }
             };
         }
 
@@ -86,8 +95,9 @@ public static class Readers
     {
         if (name == string.Empty || surname == string.Empty) throw new Exception("Поля не должны быть пустыми");
 
-        var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
+        using var db = new DbConnection();
+        var npgsqlConnection = db.NpgsqlConnection;
+        var state = db.IsConnected;
         if (!state)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
@@ -119,8 +129,9 @@ public static class Readers
 
     public static int Remove(int id)
     {
-        var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
+        using var db = new DbConnection();
+        var npgsqlConnection = db.NpgsqlConnection;
+        var state = db.IsConnected;
         if (!state)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");

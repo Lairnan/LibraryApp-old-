@@ -7,8 +7,9 @@ public static class Types
 {
     public static int Add(string name)
     {
-        var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
+        using var db = new DbConnection();
+        var npgsqlConnection = db.NpgsqlConnection;
+        var state = db.IsConnected;
         if (!state)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
@@ -32,10 +33,10 @@ public static class Types
         return result;
     }
 
-    private static NpgsqlDataReader GetDataReader()
+    private static NpgsqlDataReader GetDataReader(DbConnection db)
     {
-        var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
+        var npgsqlConnection = db.NpgsqlConnection;
+        var state = db.IsConnected;
         if (!state)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
@@ -51,7 +52,9 @@ public static class Types
 
     public static IEnumerable<Type> Get()
     {
-        var dataReader = GetDataReader();
+        using var db = new DbConnection();
+        
+        var dataReader = GetDataReader(db);
         
         while (dataReader.Read())
         {
@@ -70,8 +73,9 @@ public static class Types
     {
         if (name == string.Empty) throw new Exception("Поля не должны быть пустыми");
 
-        var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
+        using var db = new DbConnection();
+        var npgsqlConnection = db.NpgsqlConnection;
+        var state = db.IsConnected;
         if (!state)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
@@ -99,8 +103,9 @@ public static class Types
 
     public static int Remove(int id)
     {
-        var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
+        using var db = new DbConnection();
+        var npgsqlConnection = db.NpgsqlConnection;
+        var state = db.IsConnected;
         if (!state)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");

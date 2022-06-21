@@ -11,10 +11,6 @@ public static class Program
         var app = new App();
         app.InitializeComponent();
         app.Run();
-        if (DbConnection.IsConnected)
-        {
-            DbConnection.Stop();
-        }
         GC.Collect();
     }
 }

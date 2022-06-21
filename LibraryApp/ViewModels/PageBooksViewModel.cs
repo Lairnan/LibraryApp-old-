@@ -10,6 +10,7 @@ using DbConnect.Items;
 using DbConnect.Models;
 using DevExpress.Mvvm;
 using LibraryApp.Services;
+using LibraryApp.Views.Windows.Edit;
 
 namespace LibraryApp.ViewModels;
 
@@ -25,7 +26,6 @@ public class PageBooksViewModel : BindableBase, IScoped
 
     private void GetItems()
     {
-        DbConnection.Start();
         var bookList = new List<Book>();
         foreach (var book in Books.Get())
         {
@@ -61,9 +61,13 @@ public class PageBooksViewModel : BindableBase, IScoped
         {
             0 => ListBooksCollection.Where(s=>s.Id.ToString().Contains(filterText.ToLower())).ToList(),
             1 => ListBooksCollection.Where(s=>s.Name.ToLower().Contains(filterText.ToLower())).ToList(),
-            2 => ListBooksCollection.Where(s=>s.Author!.ToLower().Contains(filterText.ToLower())).ToList(),
-            3 => ListBooksCollection.Where(s=>s.Category!.ToLower().Contains(filterText.ToLower())).ToList(),
-            4 => ListBooksCollection.Where(s=>s.Style!.ToLower().Contains(filterText.ToLower())).ToList(),
+            2 => ListBooksCollection.Where(s=>
+                s.Author!.Name.ToLower().Contains(filterText.ToLower())
+                || s.Author!.Surname.ToLower().Contains(filterText.ToLower())
+                || s.Author!.Patronymic.ToLower().Contains(filterText.ToLower())
+            ).ToList(),
+            3 => ListBooksCollection.Where(s=>s.Category!.Name.ToLower().Contains(filterText.ToLower())).ToList(),
+            4 => ListBooksCollection.Where(s=>s.Style!.Name.ToLower().Contains(filterText.ToLower())).ToList(),
             _ => ListBooksCollection.Where(s=>s.Name.ToLower().Contains(filterText.ToLower())).ToList()
         };
         Application.Current.Dispatcher.Invoke(() => ListBooks = new ObservableCollection<Book>(list));
@@ -87,6 +91,9 @@ public class PageBooksViewModel : BindableBase, IScoped
 
     public static DelegateCommand<Book> EditCommand => new(item =>
     {
-        MessageBox.Show(item.Id.ToString());
+        EditBookViewModel.Book = item;
+        var editBook = new EditBook();
+        editBook.ShowDialog();
+        // MessageBox.Show(item.Id.ToString());
     },item=>item != null);
 }
