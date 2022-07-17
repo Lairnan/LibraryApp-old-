@@ -12,7 +12,6 @@ Update users and books
 ```
 ## Other function
 ```
-Login
 Change settings DB
 Change session (online or offline)
 ```
