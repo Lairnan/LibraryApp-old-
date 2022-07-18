@@ -51,6 +51,10 @@
                         Header="Изменить"
                         Command="{Binding EditCommand}"
                         CommandParameter="{Binding SelectedIndex}"/>
+                    <MenuItem 
+                        Header="Удалить"
+                        Command="{Binding DeleteCommand}"
+                        CommandParameter="{Binding SelectedIndex}"/>
                 </ContextMenu>
             </ListView.ContextMenu>
             <ListView.View>

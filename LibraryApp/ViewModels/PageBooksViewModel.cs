@@ -105,4 +105,14 @@ public class PageBooksViewModel : BindableBase, IScoped
             Application.Current.Windows[1].Close();
         }
     },index=>index != -1);
+
+    public DelegateCommand<int> DeleteCommand => new(index =>
+    {
+        if (MessageBox.Show("Вы действительно хотите удалить?", "Удаление", MessageBoxButton.YesNo) ==
+            MessageBoxResult.No)
+            return;
+        var book = ListBooks[index];
+        ListBooks.Remove(book);
+        Books.Remove(book.Id);
+    }, index => index != -1);
 }
