@@ -1,33 +1,50 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using EncryptionSample;
+using Microsoft.Win32;
 using Npgsql;
 
 namespace DbConnect;
 
-public class DbConnection : IDisposable
+public class DbConnection
 {
-    private readonly object _lockConnection = new();
+    private static readonly object _lockConnection = new();
+    private static string secretHash = "testSecret";
 
-    public DbConnection()
+    public static void Connect()
     {
         lock (_lockConnection)
         {
             if (IsConnected) return;
-            var config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .Build()
-                .GetConnectionString("PostgresDB");
-            NpgsqlConnection = new NpgsqlConnection(config);
+
+            var key = Registry.CurrentUser.OpenSubKey("LibraryAPP");
+            var host = key.GetValue("host").ToString();
+            var user = key.GetValue("user").ToString();
+            var pass = key.GetValue("password").ToString();
+            var db = key.GetValue("database").ToString();
+            var port = key.GetValue("port").ToString();
+            
+            NpgsqlConnection = new NpgsqlConnection($"host={host.Decrypt(secretHash)};" +
+                                                    $"port={port};" +
+                                                    $"User ID={user.Decrypt(secretHash)};" +
+                                                    $"password={pass.Decrypt(secretHash)};" +
+                                                    $"Database={db.Decrypt(secretHash)}");
+
+            // var config = new ConfigurationBuilder()
+            //     .SetBasePath(Directory.GetCurrentDirectory())
+            //     .AddJsonFile("appsettings.json")
+            //     .Build()
+            //     .GetConnectionString("PostgresDB");
+            // NpgsqlConnection = new NpgsqlConnection(config);
+            
             NpgsqlConnection.Open();
             IsConnected = true;
         }
     }
     
-    public bool IsConnected { get; private set; }
+    public static bool IsConnected { get; private set; }
 
-    internal readonly NpgsqlConnection NpgsqlConnection = null!;
+    internal static NpgsqlConnection NpgsqlConnection = null!;
 
-    public void Dispose()
+    public static void Close()
     {
         lock (_lockConnection)
         {

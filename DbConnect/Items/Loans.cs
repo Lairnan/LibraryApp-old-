@@ -7,9 +7,8 @@ public static class Loans
 {
     public static int Add(int book, int reader, DateTime takenDate)
     {
-        using var db = new DbConnection();
-        var npgsqlConnection = db.NpgsqlConnection;
-        var state = db.IsConnected;
+        var npgsqlConnection = DbConnection.NpgsqlConnection;
+        var state = DbConnection.IsConnected;
         if (!state)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
@@ -40,10 +39,10 @@ public static class Loans
         return result;
     }
 
-    private static NpgsqlDataReader GetDataReader(DbConnection db)
+    private static NpgsqlDataReader GetDataReader()
     {
-        var npgsqlConnection = db.NpgsqlConnection;
-        var state = db.IsConnected;
+        var npgsqlConnection = DbConnection.NpgsqlConnection;
+        var state = DbConnection.IsConnected;
         if (!state)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
@@ -68,9 +67,7 @@ public static class Loans
 
     public static IEnumerable<Loan> Get()
     {
-        using var db = new DbConnection();
-        
-        var dataReader = GetDataReader(db);
+        var dataReader = GetDataReader();
         
         while (dataReader.Read())
         {
@@ -100,9 +97,8 @@ public static class Loans
 
     public static int Update(int id, int book, int reader, DateTime takenDate)
     {
-        using var db = new DbConnection();
-        var npgsqlConnection = db.NpgsqlConnection;
-        var state = db.IsConnected;
+        var npgsqlConnection = DbConnection.NpgsqlConnection;
+        var state = DbConnection.IsConnected;
         if (!state)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
@@ -132,9 +128,8 @@ public static class Loans
 
     public static int Remove(int id)
     {
-        using var db = new DbConnection();
-        var npgsqlConnection = db.NpgsqlConnection;
-        var state = db.IsConnected;
+        var npgsqlConnection = DbConnection.NpgsqlConnection;
+        var state = DbConnection.IsConnected;
         if (!state)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
