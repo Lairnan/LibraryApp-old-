@@ -72,7 +72,7 @@ public static class Authors
                 Id = Convert.ToInt32(dataReader["id"].ToString() ?? string.Empty),
                 Name = dataReader["name"].ToString() ?? string.Empty,
                 Surname = dataReader["surname"].ToString() ?? string.Empty,
-                Patronymic = dataReader["patronymic"].ToString() ?? string.Empty
+                Patronymic = dataReader["patronymic"].ToString() != "" ? dataReader["patronymic"].ToString() : null
             };
         }
 

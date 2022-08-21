@@ -7,9 +7,8 @@ namespace DbConnect;
 public class DbConnection
 {
     private static readonly object _lockConnection = new();
-    private static string secretHash = "testSecret";
 
-    public static void Connect()
+    public static void Connect(string secretHash)
     {
         lock (_lockConnection)
         {

@@ -79,7 +79,7 @@ public static class Books
                     Id = Convert.ToInt32(dataReader["authorId"].ToString() ?? string.Empty) - 1,
                     Name = dataReader["authorName"].ToString() ?? string.Empty,
                     Surname = dataReader["authorSurname"].ToString() ?? string.Empty,
-                    Patronymic = dataReader["authorPatronymic"].ToString() ?? string.Empty,
+                    Patronymic = dataReader["patronymic"].ToString() != "" ? dataReader["patronymic"].ToString() : null
                 },
                 Category = new Category
                 {
