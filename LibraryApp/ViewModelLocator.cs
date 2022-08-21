@@ -6,6 +6,7 @@ public class ViewModelLocator
 {
     // View model windows
     public static MainViewModel MainViewModel => Ioc.Resolve<MainViewModel>();
+    public static DbSettingViewModel DbSettingViewModel => Ioc.Resolve<DbSettingViewModel>();
     
     // View model pages
     public static MainPageViewModel MainPageViewModel => Ioc.Resolve<MainPageViewModel>();

@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
+        xmlns:local="clr-namespace:LibraryApp.Views.Windows"
         DataContext="{Binding MainViewModel, Source={StaticResource ViewModelLocator}}"
         WindowStyle="None"
         mc:Ignorable="d"
@@ -19,19 +20,44 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Button 
-                Grid.Column="0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Margin="15"
-                Width="50"
-                Height="30"
-                Content="&lt;-"
-                Command="{Binding GoToBackCommand}"/>
+            <Grid Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button 
+                    Grid.Column="0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Margin="15"
+                    Width="50"
+                    Height="30"
+                    Content="&lt;-"
+                    Command="{Binding GoToBackCommand}"/>
+                <Button 
+                    Grid.Column="1"
+                    Margin="15"
+                    Command="{Binding ConnectCommand}">
+                    <Button.Content>
+                        <TextBlock>
+                            <TextBlock.Style>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Setter Property="Text" Value="Отключено"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ConnectionStatus}" Value="True">
+                                            <Setter Property="Text" Value="Подключено"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Button.Content>
+                </Button>
+            </Grid>
             <Label 
                 Grid.Column="1"
                 ContentTemplate="{Binding Title}"/>
