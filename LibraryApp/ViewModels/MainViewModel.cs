@@ -1,15 +1,14 @@
-﻿using System;
+﻿using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using DbConnect;
 using DevExpress.Mvvm;
-using EncryptionSample;
 using LibraryApp.Services;
 using LibraryApp.Views.Pages;
 using LibraryApp.Views.Windows;
-using Microsoft.Win32;
+using Npgsql;
 
 namespace LibraryApp.ViewModels;
 
@@ -50,15 +49,24 @@ public class MainViewModel : BindableBase, ISingleton
                 {
                     try
                     {
+                        var ping = new Ping();
+                        ping.Send("yandex.ru");
                         DbConnection.Connect(Program.SecretHash);
                         ConnectionStatus = DbConnection.IsConnected;
                         break;
                     }
-                    catch (Exception e)
+                    catch (PingException)
                     {
                         Application.Current.Dispatcher.Invoke(() =>
                         {
-                            MessageBox.Show(e.Message);
+                            MessageBox.Show("Отсутствует подключение к сети");
+                        });
+                    }
+                    catch (NpgsqlException exception)
+                    {
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            MessageBox.Show(exception.Message);
                             new DbSettingWindow().ShowDialog();
                         });
                     }
