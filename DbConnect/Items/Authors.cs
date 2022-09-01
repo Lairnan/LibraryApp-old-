@@ -9,8 +9,7 @@ public static class Authors
     public static int Add(string name, string surname,string? patronymic)
     {
         var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
-        if (!state)
+        if (!DbConnection.IsConnected)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
         }
@@ -46,8 +45,7 @@ public static class Authors
     private static NpgsqlDataReader GetDataReader()
     {
         var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
-        if (!state)
+        if (!DbConnection.IsConnected)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
         }
@@ -55,11 +53,59 @@ public static class Authors
         const string query = "SELECT a.id as id" +
                              ", a.name as name" +
                              ", a.surname as surname" +
-                             ", a.patronymic as patronymic " +
-                             "FROM authors a " +
-                             "ORDER BY a.id";
+                             ", a.patronymic as patronymic" +
+                             " FROM authors a " +
+                             " ORDER BY a.id";
         var npgsqlCommand = new NpgsqlCommand(query,npgsqlConnection);
         return npgsqlCommand.ExecuteReader();
+    }
+
+    private static NpgsqlDataReader GetDataReader(string name, string surname, string patronymic)
+    {
+        var npgsqlConnection = DbConnection.NpgsqlConnection;
+        if (!DbConnection.IsConnected)
+        {
+            throw new NpgsqlException("Не удалось подключиться к базе данных");
+        }
+
+        const string query = "SELECT a.id as id" +
+                             ", a.name as name" +
+                             ", a.surname as surname" +
+                             ", a.patronymic as patronymic" +
+                             " FROM authors a" +
+                             " WHERE LOWER(name) LIKE LOWER(@name)" +
+                             " AND LOWER(surname) LIKE LOWER(@surname)" +
+                             " AND LOWER(patronymic) LIKE LOWER(@patronymic)" +
+                             " ORDER BY a.id";
+
+        var npgsqlCommand = new NpgsqlCommand(query,npgsqlConnection);
+        npgsqlCommand.Parameters.AddWithValue("name", $"%{name}%");
+        npgsqlCommand.Parameters.AddWithValue("surname", $"%{surname}%");
+        npgsqlCommand.Parameters.AddWithValue("patronymic", $"%{patronymic}%");
+        return npgsqlCommand.ExecuteReader();
+    }
+
+    public static IEnumerable<Author> Search(string name = "", string surname = "", string patronymic = "")
+    {
+        if (!(!string.IsNullOrWhiteSpace(name)
+              || !string.IsNullOrWhiteSpace(surname)
+              || !string.IsNullOrWhiteSpace(patronymic)))
+            throw new ArgumentException("Один из аргументов должен быть заполненным");
+
+        var dataReader = GetDataReader(name, surname, patronymic);
+        
+        while (dataReader.Read())
+        {
+            yield return new Author{
+                Id = Convert.ToInt32(dataReader["id"].ToString() ?? string.Empty),
+                Name = dataReader["name"].ToString() ?? string.Empty,
+                Surname = dataReader["surname"].ToString() ?? string.Empty,
+                Patronymic = dataReader["patronymic"].ToString() != "" ? dataReader["patronymic"].ToString() : null
+            };
+        }
+
+        if (dataReader is {IsClosed: false})
+            dataReader.Close();
     }
 
     public static IEnumerable<Author> Get()
@@ -85,8 +131,7 @@ public static class Authors
         if (name == string.Empty || surname == string.Empty) throw new Exception("Поля не должны быть пустыми");
         
         var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
-        if (!state)
+        if (!DbConnection.IsConnected)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
         }
@@ -116,8 +161,7 @@ public static class Authors
     public static int Remove(int id)
     {
         var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
-        if (!state)
+        if (!DbConnection.IsConnected)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
         }

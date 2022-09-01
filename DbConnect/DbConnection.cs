@@ -14,7 +14,7 @@ public class DbConnection
         {
             if (IsConnected) return;
 
-            var key = Registry.CurrentUser.OpenSubKey("LibraryAPP");
+            var key = Registry.CurrentUser.OpenSubKey("LibraryAPP", false);
             var host = key.GetValue("host").ToString();
             var user = key.GetValue("user").ToString();
             var pass = key.GetValue("password").ToString();

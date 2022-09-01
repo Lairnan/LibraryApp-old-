@@ -95,6 +95,73 @@ public static class Loans
             dataReader.Close();
     }
 
+    private static NpgsqlDataReader GetDataReader(string nameBook, string nameReader, string surnameReader)
+    {
+        var npgsqlConnection = DbConnection.NpgsqlConnection;
+        if (!DbConnection.IsConnected)
+        {
+            throw new NpgsqlException("Не удалось подключиться к базе данных");
+        }
+
+        const string query = "SELECT l.id as id" +
+                             ", b.id as bookid" +
+                             ", b.name as bookname" +
+                             ", r.id as readerid" +
+                             ", r.name as readername" +
+                             ", r.surname as readersurname" +
+                             ", r.patronymic as readerpatronymic" +
+                             ", l.taken_date as taken_date" +
+                             ", l.passed as passed " +
+                             "FROM loans l " +
+                             "LEFT JOIN books b on l.book_id = b.id " +
+                             "LEFT JOIN readers r on l.reader_id = r.id " +
+                             " WHERE LOWER(b.name) LIKE LOWER(@nameBook)" +
+                             " OR LOWER(r.name) LIKE LOWER(@nameReader)" +
+                             " OR LOWER(r.surname) LIKE LOWER(@surnameReader)" +
+                             "ORDER BY l.id";
+
+        var npgsqlCommand = new NpgsqlCommand(query, npgsqlConnection);
+        npgsqlCommand.Parameters.AddWithValue("nameBook", !string.IsNullOrWhiteSpace(nameBook) ? $"%{nameBook}%" : "");
+        npgsqlCommand.Parameters.AddWithValue("nameReader", !string.IsNullOrWhiteSpace(nameReader) ? $"%{nameReader}%" : "");
+        npgsqlCommand.Parameters.AddWithValue("surnameReader", !string.IsNullOrWhiteSpace(surnameReader) ? $"%{surnameReader}%" : "");
+        return npgsqlCommand.ExecuteReader();
+    }
+
+    public static IEnumerable<Loan> Search(string nameBook = "", string nameReader = "", string surnameReader = "")
+    {
+        if (!(!string.IsNullOrWhiteSpace(nameBook)
+              || !string.IsNullOrWhiteSpace(nameReader)
+              || !string.IsNullOrWhiteSpace(surnameReader)))
+            throw new ArgumentException("Один из аргументов должен быть заполненным");
+
+        var dataReader = GetDataReader(nameBook, nameReader, surnameReader);
+
+        while (dataReader.Read())
+        {
+            DateTime.TryParse(dataReader["taken_date"].ToString(), out var takenDate);
+            yield return new Loan{
+                Id = Convert.ToInt32(dataReader["id"].ToString() ?? string.Empty),
+                Book = new Book
+                {
+                    Id = Convert.ToInt32(dataReader["bookid"].ToString() ?? string.Empty),
+                    Name = dataReader["bookname"].ToString() ?? string.Empty,
+                },
+                Reader = new Reader
+                {
+                    Id = Convert.ToInt32(dataReader["readerid"].ToString() ?? string.Empty),
+                    Name = dataReader["readername"].ToString() ?? string.Empty,
+                    Surname = dataReader["readersurname"].ToString() ?? string.Empty,
+                    Patronymic = dataReader["readerpatronymic"].ToString() ?? string.Empty
+                },
+                TakenDate = takenDate,
+                Passed = bool.Parse(dataReader["passed"].ToString() ?? "false")
+            };
+        }
+
+        if (dataReader is {IsClosed: false})
+            dataReader.Close();
+    }
+
     public static int Update(int id, int book, int reader, DateTime takenDate)
     {
         var npgsqlConnection = DbConnection.NpgsqlConnection;

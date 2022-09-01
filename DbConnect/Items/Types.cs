@@ -66,6 +66,45 @@ public static class Types
             dataReader.Close();
     }
 
+    private static NpgsqlDataReader GetDataReader(string name)
+    {
+        var npgsqlConnection = DbConnection.NpgsqlConnection;
+        if (!DbConnection.IsConnected)
+        {
+            throw new NpgsqlException("Не удалось подключиться к базе данных");
+        }
+
+        const string query = "SELECT t.id as id" +
+                             ", t.name as name " +
+                             "FROM types t " +
+                             " WHERE LOWER(name) LIKE LOWER(@name)" +
+                             "ORDER BY t.id";
+
+        var npgsqlCommand = new NpgsqlCommand(query, npgsqlConnection);
+        npgsqlCommand.Parameters.AddWithValue("name", $"%{name}%");
+        return npgsqlCommand.ExecuteReader();
+    }
+
+    public static IEnumerable<Type> Search(string name = "")
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Аргумент не может быть пустым");
+
+        var dataReader = GetDataReader(name);
+
+        while (dataReader.Read())
+        {
+            yield return new Type
+            {
+                Id = Convert.ToInt32(dataReader["id"].ToString() ?? string.Empty),
+                Name = dataReader["name"].ToString() ?? string.Empty
+            };
+        }
+
+        if (dataReader is {IsClosed: false})
+            dataReader.Close();
+    }
+
     public static int Update(int id, string name)
     {
         if (name == string.Empty) throw new Exception("Поля не должны быть пустыми");

@@ -79,7 +79,71 @@ public static class Readers
                 Type = new Type()
                 {
                     Id = Convert.ToInt32(dataReader["typeid"].ToString() ?? string.Empty),
-                    Name = dataReader["typeid"].ToString() ?? string.Empty
+                    Name = dataReader["typename"].ToString() ?? string.Empty
+                }
+            };
+        }
+
+        if (dataReader is {IsClosed: false})
+            dataReader.Close();
+    }
+
+    private static NpgsqlDataReader GetDataReader(string name, string surname, string patronymic, string typeName)
+    {
+        var npgsqlConnection = DbConnection.NpgsqlConnection;
+        if (!DbConnection.IsConnected)
+        {
+            throw new NpgsqlException("Не удалось подключиться к базе данных");
+        }
+
+        const string query = "SELECT r.id as id" +
+                             ", r.name as name" +
+                             ", r.surname as surname" +
+                             ", r.patronymic as patronymic" +
+                             ", r.birthday as birthday" +
+                             ", t.id as typeid " +
+                             ", t.name as typename " +
+                             "FROM readers r " +
+                             "LEFT JOIN types t on r.type_id = t.id " +
+                             " WHERE LOWER(r.name) LIKE LOWER(@name)" +
+                             " OR LOWER(r.surname) LIKE LOWER(@surname)" +
+                             " OR LOWER(r.patronymic) LIKE LOWER(@patronymic)" +
+                             " OR LOWER(t.name) LIKE LOWER(@typeName)" +
+                             "ORDER BY r.id";
+
+        var npgsqlCommand = new NpgsqlCommand(query, npgsqlConnection);
+        npgsqlCommand.Parameters.AddWithValue("name", !string.IsNullOrWhiteSpace(name) ? $"%{name}%" : "");
+        npgsqlCommand.Parameters.AddWithValue("surname", !string.IsNullOrWhiteSpace(surname) ? $"%{surname}%" : "");
+        npgsqlCommand.Parameters.AddWithValue("patronymic", !string.IsNullOrWhiteSpace(patronymic) ? $"%{patronymic}%" : "");
+        npgsqlCommand.Parameters.AddWithValue("typeName", !string.IsNullOrWhiteSpace(typeName) ? $"%{typeName}%" : "");
+        return npgsqlCommand.ExecuteReader();
+    }
+
+    public static IEnumerable<Reader> Search(string name = "", string surname = "", string patronymic = "",
+        string typeName = "")
+    {
+        if (!(!string.IsNullOrWhiteSpace(name)
+              || !string.IsNullOrWhiteSpace(surname)
+              || !string.IsNullOrWhiteSpace(patronymic)
+              || !string.IsNullOrWhiteSpace(typeName)))
+            throw new ArgumentException("Один из аргументов должен быть заполненным");
+
+        var dataReader = GetDataReader(name, surname, patronymic, typeName);
+
+        while (dataReader.Read())
+        {
+            DateTime.TryParse(dataReader["birthday"].ToString(), out var birthday);
+            yield return new Reader
+            {
+                Id = Convert.ToInt32(dataReader["id"].ToString() ?? string.Empty),
+                Name = dataReader["name"].ToString() ?? string.Empty,
+                Surname = dataReader["surname"].ToString() ?? string.Empty,
+                Patronymic = dataReader["patronymic"].ToString() ?? string.Empty,
+                Birthday = birthday,
+                Type = new Type()
+                {
+                    Id = Convert.ToInt32(dataReader["typeid"].ToString() ?? string.Empty),
+                    Name = dataReader["typename"].ToString() ?? string.Empty
                 }
             };
         }

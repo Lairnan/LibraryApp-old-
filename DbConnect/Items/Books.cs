@@ -8,8 +8,7 @@ public static class Books
     public static int Add(string name, int author, int category, int style)
     {
         var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
-        if (!state)
+        if (!DbConnection.IsConnected)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
         }
@@ -40,8 +39,7 @@ public static class Books
     private static NpgsqlDataReader GetDataReader()
     {
         var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
-        if (!state)
+        if (!DbConnection.IsConnected)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
         }
@@ -99,13 +97,107 @@ public static class Books
         
     }
 
+    private static NpgsqlDataReader GetDataReader(string? name, string authorName, string authorSurname, string? authorPatronymic, string? category, string? style)
+    {
+        var npgsqlConnection = DbConnection.NpgsqlConnection;
+        if (!DbConnection.IsConnected)
+        {
+            throw new NpgsqlException("Не удалось подключиться к базе данных");
+        }
+
+        var query = "SELECT b.id as id" +
+                    ", b.name as name" +
+                    ", a.id as \"authorId\"" +
+                    ", a.surname as \"authorSurname\"" +
+                    ", a.name as \"authorName\"" +
+                    ", a.patronymic as \"authorPatronymic\"" +
+                    ", c.id as categoryId" +
+                    ", c.name as categoryName" +
+                    ", s.id as styleId " +
+                    ", s.name as styleName " +
+                    "FROM books b " +
+                    "LEFT JOIN authors a on b.author_id = a.id " +
+                    "LEFT JOIN categories c on b.category_id = c.id " +
+                    "LEFT JOIN styles s on b.style_id = s.id " +
+                    " WHERE";
+
+        if (!string.IsNullOrWhiteSpace(authorName) || !string.IsNullOrWhiteSpace(authorSurname) || !string.IsNullOrWhiteSpace(authorPatronymic))
+        {
+            query += " LOWER(a.name) LIKE LOWER(@authorName)" +
+                     " OR LOWER(a.surname) LIKE LOWER(@authorSurname)" +
+                     " OR LOWER(a.patronymic) LIKE LOWER(@authorPatronymic)";
+        }
+        else
+        {
+            query += " LOWER(b.name) LIKE LOWER(@name)" +
+                     " OR LOWER(c.name) LIKE LOWER(@category)" +
+                     " OR LOWER(s.name) LIKE LOWER(@style)";
+        }
+        
+        query += " ORDER BY b.id";
+
+        var npgsqlCommand = new NpgsqlCommand(query, npgsqlConnection);
+        if (!string.IsNullOrWhiteSpace(authorName) || !string.IsNullOrWhiteSpace(authorSurname) || !string.IsNullOrWhiteSpace(authorPatronymic))
+        {
+            npgsqlCommand.Parameters.AddWithValue("authorName", authorName);
+            npgsqlCommand.Parameters.AddWithValue("authorSurname", authorSurname);
+            if (authorPatronymic != null) npgsqlCommand.Parameters.AddWithValue("authorPatronymic", authorPatronymic);
+        }
+        else
+        {
+            npgsqlCommand.Parameters.AddWithValue("name",  !string.IsNullOrWhiteSpace(name) ? $"%{name}%" : "");
+            npgsqlCommand.Parameters.AddWithValue("category", !string.IsNullOrWhiteSpace(category) ? $"%{category}%" : "");
+            npgsqlCommand.Parameters.AddWithValue("style", !string.IsNullOrWhiteSpace(style) ? $"%{style}%" : "");
+        }
+
+        return npgsqlCommand.ExecuteReader();
+    }
+
+    public static IEnumerable<Book> Search(string name = "", string authorName = "", string authorSurname = "", string? authorPatronymic = "", string category = "", string style = "")
+    {
+        if (!(!string.IsNullOrWhiteSpace(name)
+              || (!string.IsNullOrWhiteSpace(authorName) || !string.IsNullOrWhiteSpace(authorSurname) || !string.IsNullOrWhiteSpace(authorPatronymic))
+              || !string.IsNullOrWhiteSpace(category)
+              || !string.IsNullOrWhiteSpace(style)))
+            throw new ArgumentException("Один из аргументов должен быть заполненным");
+
+        var dataReader = GetDataReader(name, authorName, authorSurname, authorPatronymic, category, style);
+
+        while (dataReader.Read())
+        {
+            yield return new Book{
+                Id = Convert.ToInt32(dataReader["id"].ToString() ?? string.Empty),
+                Name = dataReader["name"].ToString() ?? string.Empty,
+                Author = new Author
+                {
+                    Id = Convert.ToInt32(dataReader["authorId"].ToString() ?? string.Empty) - 1,
+                    Name = dataReader["authorName"].ToString() ?? string.Empty,
+                    Surname = dataReader["authorSurname"].ToString() ?? string.Empty,
+                    Patronymic = dataReader["authorPatronymic"].ToString() != "" ? dataReader["authorPatronymic"].ToString() : null
+                },
+                Category = new Category
+                {
+                    Id = Convert.ToInt32(dataReader["categoryId"].ToString() ?? string.Empty) - 1,
+                    Name = dataReader["categoryName"].ToString() ?? string.Empty
+                },
+                Style = new Style
+                {
+                    Id = Convert.ToInt32(dataReader["styleId"].ToString() ?? string.Empty) - 1,
+                    Name = dataReader["styleName"].ToString() ?? string.Empty
+                },
+            };
+        }
+
+        if (dataReader is {IsClosed: false})
+            dataReader.Close();
+    }
+
     public static int Update(int id, string name, int author, int category, int style)
     {
         if (name == string.Empty) throw new Exception("Поля не должны быть пустыми");
         
         var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
-        if (!state)
+        if (!DbConnection.IsConnected)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
         }
@@ -136,8 +228,7 @@ public static class Books
     public static int Remove(int id)
     {
         var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
-        if (!state)
+        if (!DbConnection.IsConnected)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
         }

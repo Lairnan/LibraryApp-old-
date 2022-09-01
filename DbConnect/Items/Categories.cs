@@ -8,8 +8,7 @@ public static class Categories
     public static int Add(string name)
     {
         var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
-        if (!state)
+        if (!DbConnection.IsConnected)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
         }
@@ -35,8 +34,7 @@ public static class Categories
     private static NpgsqlDataReader GetDataReader()
     {
         var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
-        if (!state)
+        if (!DbConnection.IsConnected)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
         }
@@ -65,13 +63,51 @@ public static class Categories
             dataReader.Close();
     }
 
+    private static NpgsqlDataReader GetDataReader(string name)
+    {
+        var npgsqlConnection = DbConnection.NpgsqlConnection;
+        if (!DbConnection.IsConnected)
+        {
+            throw new NpgsqlException("Не удалось подключиться к базе данных");
+        }
+
+        const string query = "SELECT c.id as id" +
+                             ", c.name as name" +
+                             " FROM categories c" +
+                             " WHERE LOWER(name) LIKE LOWER(@name)" +
+                             " ORDER BY c.id"; 
+
+        var npgsqlCommand = new NpgsqlCommand(query, npgsqlConnection);
+        npgsqlCommand.Parameters.AddWithValue("name", $"%{name}%");
+        return npgsqlCommand.ExecuteReader();
+    }
+
+    public static IEnumerable<Category> Search(string name = "")
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Аргумент не может быть пустым");
+
+        var dataReader = GetDataReader(name);
+
+        while (dataReader.Read())
+        {
+            yield return new Category
+            {
+                Id = Convert.ToInt32(dataReader["id"].ToString() ?? string.Empty),
+                Name = dataReader["name"].ToString() ?? string.Empty
+            };
+        }
+
+        if (dataReader is {IsClosed: false})
+            dataReader.Close();
+    }
+
     public static int Update(int id, string name)
     {
         if (name == string.Empty) throw new Exception("Поля не должны быть пустыми");
         
         var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
-        if (!state)
+        if (!DbConnection.IsConnected)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
         }
@@ -99,8 +135,7 @@ public static class Categories
     public static int Remove(int id)
     {
         var npgsqlConnection = DbConnection.NpgsqlConnection;
-        var state = DbConnection.IsConnected;
-        if (!state)
+        if (!DbConnection.IsConnected)
         {
             throw new NpgsqlException("Не удалось подключиться к базе данных");
         }
