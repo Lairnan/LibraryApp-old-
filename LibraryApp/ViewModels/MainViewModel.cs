@@ -16,6 +16,8 @@ public class MainViewModel : BindableBase, ISingleton
 {
     private readonly PageService _pageService;
 
+    internal static bool ConnectionAttempt { get; set; } = true;
+
     public static string Title => "Главное окно";
     public bool ConnectionStatus { get; private set; }
     public Page CurrentPage { get; private set; }
@@ -43,9 +45,10 @@ public class MainViewModel : BindableBase, ISingleton
         }
         else
         {
+            ConnectionAttempt = true;
             Task.Run(() =>
             {
-                while (true)
+                while (ConnectionAttempt)
                 {
                     try
                     {
@@ -80,5 +83,10 @@ public class MainViewModel : BindableBase, ISingleton
     public static ICommand MinimizeApplicationCommand => new DelegateCommand(() =>
     {
         Application.Current.MainWindow.WindowState = WindowState.Minimized;
+    });
+
+    public static ICommand ChangeDbSettingCommand => new DelegateCommand(() =>
+    {
+        new DbSettingWindow().ShowDialog();
     });
 }

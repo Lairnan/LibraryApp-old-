@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using System.Windows;
+using System.Windows.Input;
 using DevExpress.Mvvm;
 using LibraryApp.Services;
 using LibraryApp.Views.Pages;
@@ -16,6 +17,9 @@ public class MainPageViewModel : BindableBase, ISingleton
 
     public ICommand GoToViewBooksCommand => new DelegateCommand(() =>
     {
-        _pageService.Navigate(new ViewBooksPage());
+        if (DbConnect.DbConnection.IsConnected)
+            _pageService.Navigate(new ViewBooksPage());
+        else
+            MessageBox.Show("Проверьте подключение к базе данных", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
     });
 }

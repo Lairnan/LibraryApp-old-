@@ -29,15 +29,22 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Button 
-                    Grid.Column="0"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Top"
-                    Margin="15"
-                    Width="50"
-                    Height="30"
-                    Content="&lt;-"
-                    Command="{Binding GoToBackCommand}"/>
+                <StackPanel
+                    Orientation="Vertical">
+                    <Button 
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Margin="15"
+                        Width="50"
+                        Height="30"
+                        Content="&lt;-"
+                        Command="{Binding GoToBackCommand}"/>
+                    <Button
+                        fa:Awesome.Content="Gear"
+                        Height="25"
+                        Width="25"
+                        Command="{Binding ChangeDbSettingCommand}"/>
+                </StackPanel>
                 <Button 
                     Grid.Column="1"
                     Margin="15"

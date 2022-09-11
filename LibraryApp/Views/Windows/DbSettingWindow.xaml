@@ -8,12 +8,12 @@
         Title="Изменение настроек"
         ResizeMode="NoResize"
         WindowStyle="SingleBorderWindow"
-        Height="300" 
+        Height="325" 
         Width="300"
         WindowStartupLocation="CenterScreen">
     <StackPanel
         Orientation="Vertical"
-        Margin="45">
+        Margin="45 25 45 15">
         <DockPanel>
             <TextBlock
                 Margin="0 0 10 0"
@@ -64,5 +64,10 @@
                 Content="Сохранить"
                 Margin="30 10"
                 Command="{Binding ChangeDbStringCommand}"/>
+            <Button
+                Height="30"
+                Content="Отменить"
+                Margin="30 10"
+                Command="{Binding CancelCommand}"/>
     </StackPanel>
 </Window>
