@@ -6,14 +6,38 @@
       DataContext="{Binding MainPageViewModel, Source={StaticResource ViewModelLocator}}"
       mc:Ignorable="d"
       Title="MainPage">
-    <StackPanel 
-        Orientation="Vertical"
-        VerticalAlignment="Center"
-        HorizontalAlignment="Center">
-        <Button
-            Background="{DynamicResource MaterialDesignDarkBackground}"
-            Foreground="{DynamicResource MaterialDesignDarkForeground}"
-            Content="Просмотреть весь список книг"
-            Command="{Binding GoToViewBooksCommand}"/>
-    </StackPanel>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <StackPanel 
+            Orientation="Vertical"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center">
+            <Label
+                HorizontalAlignment="Center"
+                Content="Выборка данных"/>
+            <Button
+                Background="{DynamicResource MaterialDesignDarkBackground}"
+                Foreground="{DynamicResource MaterialDesignDarkForeground}"
+                Content="Просмотреть весь список книг"
+                Command="{Binding GoToViewBooksCommand}"/>
+        </StackPanel>
+        <StackPanel
+            Grid.Column="1"
+            Margin="20 0"
+            Orientation="Vertical"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center">
+            <Label
+                HorizontalAlignment="Center"
+                Content="Добавление данных"/>
+            <Button
+                Background="{DynamicResource MaterialDesignDarkBackground}"
+                Foreground="{DynamicResource MaterialDesignDarkForeground}"
+                Content="Добавление книг"
+                Command="{Binding GoToAddBooksCommand}"/>
+        </StackPanel>
+    </Grid>
 </Page>

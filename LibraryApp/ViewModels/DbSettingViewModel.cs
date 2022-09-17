@@ -1,11 +1,7 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using DevExpress.Mvvm;
-using DevExpress.Mvvm.POCO;
 using EncryptionSample;
 using LibraryApp.Views.Windows;
 using Microsoft.Win32;
@@ -43,7 +39,7 @@ public class DbSettingViewModel : BindableBase, IScoped
         key.SetValue("password", Password.Encrypt(Program.SecretHash));
         key.SetValue("database", Database.Encrypt(Program.SecretHash));
         key.SetValue("port", Port);
-        Application.Current.Windows.OfType<DbSettingWindow>().SingleOrDefault()?.Close();
+        Application.Current.Windows.OfType<DbSettingWindow>().Single().Close();
     }, () => !(string.IsNullOrWhiteSpace(Host) 
                || !int.TryParse(Port, out var x)
                || string.IsNullOrWhiteSpace(User) 
@@ -52,7 +48,6 @@ public class DbSettingViewModel : BindableBase, IScoped
 
     public static ICommand CancelCommand => new DelegateCommand(() =>
     {
-        MainViewModel.ConnectionAttempt = false;
-        Application.Current.Windows.OfType<DbSettingWindow>().SingleOrDefault()?.Close();
+        Application.Current.Windows.OfType<DbSettingWindow>().Single().Close();
     });
 }

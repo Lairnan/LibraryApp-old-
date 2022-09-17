@@ -1,19 +1,19 @@
 ﻿using System;
-using DbConnect;
 
 namespace LibraryApp;
 
 public static class Program
 {
-    internal static string SecretHash = "testSecret";
+    internal const string SecretHash = "testSecret";
+
     [STAThread]
     public static void Main(string[] args)
     {
         var app = new App();
+        LibraryDb.Context.LibraryDbContext.SetHash(SecretHash);
         app.InitializeComponent();
         app.Run();
-        if(DbConnection.IsConnected)
-            DbConnection.Close();
+        
         GC.Collect();
     }
 }

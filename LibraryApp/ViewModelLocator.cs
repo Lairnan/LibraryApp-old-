@@ -1,4 +1,7 @@
 ﻿using LibraryApp.ViewModels;
+using LibraryApp.ViewModels.Add;
+using LibraryApp.ViewModels.Edit;
+using LibraryApp.ViewModels.PageViews;
 
 namespace LibraryApp;
 
@@ -16,5 +19,5 @@ public class ViewModelLocator
     public static EditBookViewModel EditBookViewModel => Ioc.Resolve<EditBookViewModel>();
     
     // View model adds
-    // public static EditBookViewModel EditBookViewModel => Ioc.Resolve<EditBookViewModel>();
+    public static AddBookViewModel AddBookViewModel => Ioc.Resolve<AddBookViewModel>();
 }

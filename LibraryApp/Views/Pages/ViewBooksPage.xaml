@@ -33,6 +33,7 @@
                 Width="125"
                 FontSize="16"
                 SelectedIndex="{Binding SelectedComboBox}">
+                <TextBlock Text="Отменить"/>
                 <TextBlock Text="Номер"/>
                 <TextBlock Text="Название"/>
                 <TextBlock Text="Автор"/>
@@ -59,9 +60,9 @@
             </ListView.ContextMenu>
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="№" DisplayMemberBinding="{Binding Id}"/>
-                    <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Name}"/>
-                    <GridViewColumn Header="Автор">
+                    <GridViewColumn Header="№" Width="20" DisplayMemberBinding="{Binding Id}"/>
+                    <GridViewColumn Header="Название" Width="175" DisplayMemberBinding="{Binding Name}"/>
+                    <GridViewColumn Header="Автор" Width="150">
                         <GridViewColumn.DisplayMemberBinding>
                             <MultiBinding StringFormat="{}{0} {1} {2}">
                                 <Binding Path="Author.Surname"/>
@@ -70,8 +71,8 @@
                             </MultiBinding>
                         </GridViewColumn.DisplayMemberBinding>
                     </GridViewColumn>
-                    <GridViewColumn Header="Жанр" DisplayMemberBinding="{Binding Style.Name}"/>
-                    <GridViewColumn Header="Категория" DisplayMemberBinding="{Binding Category.Name}"/>
+                    <GridViewColumn Header="Жанр" Width="125" DisplayMemberBinding="{Binding Style.Name}"/>
+                    <GridViewColumn Header="Категория" Width="120" DisplayMemberBinding="{Binding Category.Name}"/>
                 </GridView>
             </ListView.View>
         </ListView>
